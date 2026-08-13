@@ -10,6 +10,8 @@
   --accent: #4a525b;
   --accent-hover: #2f353c;
   --accent-soft: #e6eaee;
+  --cta: #0b7a6c;
+  --cta-hover: #086257;
   --ok: #1a6a44;
   --ok-soft: #def3e8;
   --gold: #6d7782;
@@ -172,13 +174,13 @@ p {
 }
 
 .btn-primary {
-  background: var(--dark);
+  background: var(--cta);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(18, 22, 27, 0.2);
+  box-shadow: 0 10px 24px rgba(11, 122, 108, 0.28);
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
+  background: var(--cta-hover);
 }
 
 .btn-dark {
