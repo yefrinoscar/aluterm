@@ -10,8 +10,8 @@
   --accent: #4a525b;
   --accent-hover: #2f353c;
   --accent-soft: #e6eaee;
-  --cta: #0b7a6c;
-  --cta-hover: #086257;
+  --cta: #c1121f;
+  --cta-hover: #9b0e19;
   --ok: #1a6a44;
   --ok-soft: #def3e8;
   --gold: #6d7782;
@@ -176,7 +176,7 @@ p {
 .btn-primary {
   background: var(--cta);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(11, 122, 108, 0.28);
+  box-shadow: 0 10px 24px rgba(193, 18, 31, 0.28);
 }
 
 .btn-primary:hover {
