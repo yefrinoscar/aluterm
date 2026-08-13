@@ -1,0 +1,49 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { brand, siteUrl } from "../data/product";
+---
+
+<BaseLayout
+  title={`Política de privacidad | ${brand.name}`}
+  description="Cómo AluTerm trata tus datos personales en Perú."
+  canonical={`${siteUrl}/politicas`}
+>
+  <Header />
+  <main class="page wrap" id="contenido">
+    <h1>Política de privacidad</h1>
+    <p>
+      AluTerm trata tus datos para vender y entregar mantas térmicas en el Perú. Responsable:
+      {brand.legalName}. Contacto: {brand.email}.
+    </p>
+    <h2>Qué datos pedimos</h2>
+    <p>
+      Nombre, celular, correo, DNI opcional, dirección de entrega y método de pago. También
+      podemos guardar UTMs y clics de anuncios (gclid, fbclid, ttclid) para medir campañas.
+    </p>
+    <h2>Para qué</h2>
+    <p>
+      Procesar el pedido, cobrar con Mercado Pago o Yape, coordinar el courier, atender
+      cambios y medir publicidad. Base legal: ejecución del contrato y consentimiento en
+      marketing.
+    </p>
+    <h2>Con quién</h2>
+    <p>
+      Mercado Pago, courier, WhatsApp/Meta si nos escribes, y plataformas de anuncios (Meta,
+      Google, TikTok) si activas sus píxeles. No vendemos tu lista.
+    </p>
+    <h2>Conservación y derechos</h2>
+    <p>
+      Guardamos el pedido el tiempo que exija SUNAT y la atención postventa. Puedes pedir
+      acceso, rectificación o baja escribiendo a {brand.email}, según la Ley 29733.
+    </p>
+    <h2>Cookies</h2>
+    <p>
+      Usamos cookies técnicas y, si configuras los IDs, píxeles de medición. Puedes bloquearlos
+      en el navegador; el checkout seguirá funcionando.
+    </p>
+  </main>
+  <Footer />
+</BaseLayout>

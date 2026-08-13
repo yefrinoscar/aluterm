@@ -1,0 +1,275 @@
+---
+import { departments, packs, shipping } from "../data/product";
+import { soles } from "../lib/money";
+
+const yapePhone = import.meta.env.PUBLIC_YAPE_PHONE || "999999999";
+const yapeName = import.meta.env.PUBLIC_YAPE_NAME || "AluTerm";
+const mpPublic = import.meta.env.PUBLIC_MP_PUBLIC_KEY || "";
+---
+
+<section class="section checkout" id="comprar">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Pedido</p>
+      <h2>Paga con Yape, Mercado Pago o contraentrega.</h2>
+      <p>Lima y Callao en 24–48 h. Provincias en 2–5 días. El pack de 5 viaja gratis.</p>
+    </div>
+
+    <div class="checkout-grid">
+      <aside class="panel summary" data-summary>
+        <h3 style="margin:0 0 .4rem;font-size:1.15rem">Tu pack</h3>
+        <div class="pay-options" style="margin-bottom:.4rem">
+          {packs.map((pack) => (
+            <button
+              type="button"
+              class:list={["pay", pack.highlight && "is-on"]}
+              data-pack={pack.id}
+              data-units={pack.units}
+              data-price={pack.price}
+              data-free={pack.freeShipping ? "1" : "0"}
+            >
+              <span></span>
+              <span>
+                <b>{pack.title}</b> · {soles(pack.price)}
+                <small>
+                  {soles(pack.unitPrice)} c/u
+                  {pack.freeShipping ? " · envío gratis" : ""}
+                </small>
+              </span>
+            </button>
+          ))}
+        </div>
+        <div class="summary-line"><span>Subtotal</span><b data-sub>S/ 50</b></div>
+        <div class="summary-line"><span>Envío</span><b data-ship>Gratis</b></div>
+        <div class="summary-total"><span>Total</span><b data-total>S/ 50</b></div>
+        <p class="sub" style="color:rgba(255,255,255,.62);font-size:.88rem">
+          Envío Lima/Callao S/ {shipping.lima} · Provincias S/ {shipping.provincia} · Gratis desde 5 unidades.
+        </p>
+      </aside>
+
+      <form class="panel form" id="order-form" novalidate>
+        <div class="form-error" data-error></div>
+        <div class="form-row">
+          <label>Nombre completo
+            <input name="name" autocomplete="name" required minlength="3" placeholder="Como en tu DNI" />
+          </label>
+          <label>Celular
+            <input name="phone" inputmode="numeric" autocomplete="tel" required placeholder="9XXXXXXXX" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Correo
+            <input name="email" type="email" autocomplete="email" required placeholder="para la boleta y Mercado Pago" />
+          </label>
+          <label>DNI <span style="font-weight:500;opacity:.65">(opcional)</span>
+            <input name="dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Departamento
+            <select name="department" required>
+              {departments.map((d) => (
+                <option value={d} selected={d === "Lima"}>{d}</option>
+              ))}
+            </select>
+          </label>
+          <label>Distrito
+            <input name="district" required placeholder="Miraflores, Cusco, Trujillo…" />
+          </label>
+        </div>
+        <label>Dirección
+          <input name="address" autocomplete="street-address" required placeholder="Calle, número, dpto." />
+        </label>
+        <label>Referencia
+          <input name="reference" placeholder="Frente al parque, piso 3…" />
+        </label>
+
+        <p style="font-weight:750;margin:.3rem 0 0">Cómo quieres pagar</p>
+        <div class="pay-options">
+          <button type="button" class="pay is-on" data-pay="mercadopago">
+            <span></span>
+            <span>
+              <b>Mercado Pago</b>
+              <small>Tarjeta, Yape, Plin y más. Pago seguro.</small>
+            </span>
+          </button>
+          <button type="button" class="pay" data-pay="yape">
+            <span></span>
+            <span>
+              <b>Yape directo</b>
+              <small>Te mostramos el número y el monto exacto.</small>
+            </span>
+          </button>
+          <button type="button" class="pay" data-pay="contraentrega">
+            <span></span>
+            <span>
+              <b>Contraentrega</b>
+              <small>Pagas en efectivo cuando llega el courier.</small>
+            </span>
+          </button>
+        </div>
+
+        <div class="yape-box" data-yape>
+          <div>
+            <img src="/images/yape-qr.svg" alt="Código QR de Yape AluTerm" width="160" height="160" />
+          </div>
+          <div>
+            <b>Yapea a {yapeName}</b>
+            <p style="margin:.3rem 0 0">Número: <b data-yape-phone>{yapePhone}</b></p>
+            <p style="margin:.25rem 0 0">Monto: <b data-yape-amount>S/ 50</b></p>
+            <p style="margin:.25rem 0 0;opacity:.85;font-size:.9rem">
+              En el mensaje pon tu nombre. Luego pulsa “Hacer pedido” y te confirmamos por WhatsApp.
+            </p>
+          </div>
+        </div>
+
+        <input type="hidden" name="packId" value="pack5" />
+        <input type="hidden" name="paymentMethod" value="mercadopago" />
+
+        <button class="btn btn-primary btn-full" type="submit" data-submit>
+          Hacer pedido
+        </button>
+        <p style="text-align:center;color:rgba(255,255,255,.6);font-size:.82rem">
+          Al pedir aceptas los <a href="/terminos">términos</a> y la
+          <a href="/politicas">privacidad</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ lima: shipping.lima, provincia: shipping.provincia, mpPublic }}>
+  const form = document.getElementById("order-form");
+  if (form instanceof HTMLFormElement) {
+    const packButtons = [...document.querySelectorAll("[data-pack]")];
+    const payButtons = [...document.querySelectorAll("[data-pay]")];
+    const yapeBox = document.querySelector("[data-yape]");
+    const errorBox = document.querySelector("[data-error]");
+    const packInput = form.elements.namedItem("packId");
+    const payInput = form.elements.namedItem("paymentMethod");
+    const dept = form.elements.namedItem("department");
+
+    const state = { packId: "pack5", pay: "mercadopago" };
+
+    function packData() {
+      const btn = document.querySelector(`[data-pack="${state.packId}"]`);
+      return {
+        units: Number(btn?.getAttribute("data-units") || 5),
+        price: Number(btn?.getAttribute("data-price") || 50),
+        free: btn?.getAttribute("data-free") === "1",
+      };
+    }
+
+    function shipCost() {
+      const pack = packData();
+      if (pack.free) return 0;
+      const value = dept instanceof HTMLSelectElement ? dept.value : "Lima";
+      return value === "Lima" || value === "Callao" ? lima : provincia;
+    }
+
+    function money(n) {
+      return new Intl.NumberFormat("es-PE", {
+        style: "currency",
+        currency: "PEN",
+        maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function render() {
+      const pack = packData();
+      const ship = shipCost();
+      const total = pack.price + ship;
+      const set = (sel, text) => {
+        document.querySelectorAll(sel).forEach((el) => {
+          el.textContent = text;
+        });
+      };
+      set("[data-sub]", money(pack.price));
+      set("[data-ship]", ship === 0 ? "Gratis" : money(ship));
+      set("[data-total]", money(total));
+      set("[data-yape-amount]", money(total));
+      if (packInput instanceof HTMLInputElement) packInput.value = state.packId;
+      if (payInput instanceof HTMLInputElement) payInput.value = state.pay;
+      yapeBox?.classList.toggle("is-on", state.pay === "yape");
+      const stickyNow = document.querySelector("[data-sticky-now]");
+      const stickyNote = document.querySelector("[data-sticky-note]");
+      if (stickyNow) stickyNow.textContent = money(total);
+      if (stickyNote) stickyNote.textContent = pack.free ? "Envío gratis · Pack x" + pack.units : "Pack x" + pack.units;
+    }
+
+    packButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.packId = btn.getAttribute("data-pack") || "pack5";
+        packButtons.forEach((b) => b.classList.toggle("is-on", b === btn));
+        render();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "add_to_cart",
+          ecommerce: { currency: "PEN", value: packData().price, items: [{ item_id: state.packId }] },
+        });
+        if (window.fbq) window.fbq("track", "AddToCart", { value: packData().price, currency: "PEN" });
+      });
+    });
+
+    document.querySelectorAll("[data-select-pack]").forEach((link) => {
+      link.addEventListener("click", () => {
+        const id = link.getAttribute("data-select-pack");
+        const btn = document.querySelector(`[data-pack="${id}"]`);
+        if (btn instanceof HTMLElement) btn.click();
+      });
+    });
+
+    payButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.pay = btn.getAttribute("data-pay") || "mercadopago";
+        payButtons.forEach((b) => b.classList.toggle("is-on", b === btn));
+        render();
+      });
+    });
+
+    dept?.addEventListener("change", render);
+    render();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector("[data-submit]");
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.attribution = JSON.parse(localStorage.getItem("alu_attr") || "{}");
+      errorBox?.classList.remove("is-on");
+      if (submit instanceof HTMLButtonElement) {
+        submit.disabled = true;
+        submit.textContent = "Procesando…";
+      }
+      if (window.fbq) window.fbq("track", "InitiateCheckout", { value: packData().price, currency: "PEN" });
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "begin_checkout", ecommerce: { currency: "PEN", value: packData().price } });
+      try {
+        const res = await fetch("/api/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "No se pudo crear el pedido");
+        if (data.initPoint) {
+          location.href = data.initPoint;
+          return;
+        }
+        const next = new URL("/gracias", location.origin);
+        next.searchParams.set("order", data.orderId);
+        next.searchParams.set("status", data.status || "ok");
+        next.searchParams.set("pay", state.pay);
+        location.href = next.toString();
+      } catch (err) {
+        if (errorBox) {
+          errorBox.textContent = err instanceof Error ? err.message : "Inténtalo de nuevo";
+          errorBox.classList.add("is-on");
+        }
+        if (submit instanceof HTMLButtonElement) {
+          submit.disabled = false;
+          submit.textContent = "Hacer pedido";
+        }
+      }
+    });
+  }
+</script>

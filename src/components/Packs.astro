@@ -1,0 +1,51 @@
+---
+import { packs, shipping } from "../data/product";
+import { soles } from "../lib/money";
+---
+
+<section class="section" id="packs">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Elige tu pack</p>
+      <h2>Mientras más llevas, menos pagas.</h2>
+      <p>
+        Una sola manta sirve. Tres cubren casa, auto y mochila. Cinco cierran el kit de la
+        familia y viajan sin costo de envío.
+      </p>
+    </div>
+
+    <div class="packs-grid">
+      {packs.map((pack) => (
+        <article class:list={["pack", pack.highlight && "is-hot"]} data-pack-card={pack.id}>
+          {pack.badge && (
+            <span class:list={["pill", "pack-badge", pack.highlight ? "pill-gold" : "pill-ok"]}>
+              {pack.badge}
+            </span>
+          )}
+          <div>
+            <h3>{pack.title}</h3>
+            <p class="sub">{pack.subtitle}</p>
+          </div>
+          <div class="price">{soles(pack.price)}</div>
+          <div class="meta">
+            <span>{soles(pack.unitPrice)} c/u</span>
+            {pack.compareAt > pack.price && (
+              <>
+                <span class="strike">{soles(pack.compareAt)}</span>
+                <span class="save">Ahorras {soles(pack.compareAt - pack.price)}</span>
+              </>
+            )}
+          </div>
+          <p class="sub">
+            {pack.freeShipping
+              ? "Envío gratis a todo el Perú"
+              : `Envío S/ ${shipping.lima} Lima · S/ ${shipping.provincia} provincias`}
+          </p>
+          <a class="btn btn-primary btn-full" href="#comprar" data-select-pack={pack.id}>
+            Elegir {pack.title}
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

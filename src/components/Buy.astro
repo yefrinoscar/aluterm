@@ -1,0 +1,186 @@
+---
+import { Image } from "astro:assets";
+import { packs, product, shipping } from "../data/product";
+import { soles } from "../lib/money";
+import persona from "../assets/images/persona-frente.jpg";
+import perfil from "../assets/images/persona-perfil.jpg";
+import packsImg from "../assets/images/packs.jpg";
+import compact from "../assets/images/compact.jpg";
+import desplegada from "../assets/images/desplegada.jpg";
+
+const best = packs.find((p) => p.highlight)!;
+const thumbs = [
+  { src: persona, alt: "Persona envuelta en manta térmica de emergencia Mylar" },
+  { src: packsImg, alt: "Packs de mantas térmicas plegadas" },
+  { src: compact, alt: "Manta térmica plegada en la palma" },
+  { src: desplegada, alt: "Manta térmica 140 × 210 cm desplegada" },
+  { src: perfil, alt: "Uso de manta aluminizada de emergencia" },
+];
+---
+
+<section class="buy" id="comprar">
+  <div class="wrap-wide buy-grid">
+    <div class="buy-media" data-gallery>
+      <div class="gallery-main">
+        <Image
+          src={persona}
+          alt={thumbs[0].alt}
+          widths={[480, 720, 960, 1200]}
+          sizes="(max-width: 70em) 100vw, 560px"
+          quality={82}
+          id="gallery-main"
+        />
+      </div>
+      <div class="gallery-thumbs" role="list">
+        {thumbs.map((thumb, i) => (
+          <button
+            type="button"
+            data-thumb={i}
+            data-full={thumb.src.src}
+            data-alt={thumb.alt}
+            class={i === 0 ? "is-active" : ""}
+            aria-label={`Ver foto ${i + 1}`}
+          >
+            <Image src={thumb.src} alt={thumb.alt} width={140} quality={70} />
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="buy-panel">
+      <p class="eyebrow">Manta térmica de emergencia</p>
+      <h1>{product.shortName} 140 × 210 cm</h1>
+      <p class="buy-lead">{product.subhead}</p>
+
+      <div class="buy-price">
+        <span class="now" data-total>{soles(best.price)}</span>
+        <span class="was" data-compare-label>{soles(best.compareAt)}</span>
+        <span class="note" data-ship>Envío gratis</span>
+      </div>
+      <p class="buy-unit" data-unit-label>{soles(best.unitPrice)} cada una</p>
+
+      <p class="buy-label">Elige cuántas llevas</p>
+      <div class="offers" role="listbox" aria-label="Packs">
+        {packs.map((pack) => (
+          <button
+            type="button"
+            class:list={["offer", pack.highlight && "is-on", pack.highlight && "is-best"]}
+            data-pack={pack.id}
+            data-units={pack.units}
+            data-price={pack.price}
+            data-compareat={pack.compareAt}
+            data-unitprice={pack.unitPrice}
+            data-free={pack.freeShipping ? "1" : "0"}
+            data-title={pack.title}
+          >
+            <span class="offer-radio" aria-hidden="true"></span>
+            <span class="offer-body">
+              <span class="offer-top">
+                <strong>{pack.title}</strong>
+                {pack.badge && <em>{pack.badge}</em>}
+              </span>
+              <span class="offer-sub">{pack.subtitle}</span>
+              <span class="offer-dots" aria-hidden="true">
+                {Array.from({ length: pack.units }).map(() => <i></i>)}
+              </span>
+            </span>
+            <span class="offer-price">
+              <b>{soles(pack.price)}</b>
+              <small>
+                {soles(pack.unitPrice)} c/u
+                {pack.freeShipping ? " · envío gratis" : ""}
+              </small>
+              {pack.compareAt > pack.price && (
+                <small class="offer-save">Ahorras {soles(pack.compareAt - pack.price)}</small>
+              )}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <a class="btn btn-primary btn-full btn-buy" href={`/checkout?pack=${best.id}`} data-go-checkout>
+        Continuar al pago · <span data-total>{soles(best.price)}</span>
+      </a>
+      <p class="buy-fine">
+        En la siguiente pantalla eliges Yape, Mercado Pago o contraentrega.
+        Envío Lima S/ {shipping.lima} · provincias S/ {shipping.provincia} · gratis desde 5.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector("[data-gallery]");
+  const main = document.querySelector("#gallery-main");
+  if (root && main instanceof HTMLImageElement) {
+    root.querySelectorAll("[data-thumb]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const full = btn.getAttribute("data-full");
+        if (!full) return;
+        main.src = full;
+        main.removeAttribute("srcset");
+        main.alt = btn.getAttribute("data-alt") || "";
+        root.querySelectorAll("[data-thumb]").forEach((b) => b.classList.toggle("is-active", b === btn));
+      });
+    });
+  }
+
+  const buttons = [...document.querySelectorAll("[data-pack]")];
+  let packId = "pack5";
+
+  function packData() {
+    const btn = document.querySelector(`[data-pack="${packId}"]`);
+    return {
+      units: Number(btn?.getAttribute("data-units") || 5),
+      price: Number(btn?.getAttribute("data-price") || 50),
+      compare: Number(btn?.getAttribute("data-compareat") || 75),
+      unit: Number(btn?.getAttribute("data-unitprice") || 10),
+      free: btn?.getAttribute("data-free") === "1",
+      title: btn?.getAttribute("data-title") || "Pack x5",
+    };
+  }
+
+  function money(n: number) {
+    return new Intl.NumberFormat("es-PE", {
+      style: "currency",
+      currency: "PEN",
+      maximumFractionDigits: 0,
+    }).format(n);
+  }
+
+  function render() {
+    const pack = packData();
+    const set = (sel: string, text: string) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        el.textContent = text;
+      });
+    };
+    set("[data-total]", money(pack.price));
+    set("[data-compare-label]", pack.compare > pack.price ? money(pack.compare) : "");
+    set("[data-ship]", pack.free ? "Envío gratis" : "Envío al pagar");
+    set("[data-unit-label]", money(pack.unit) + " cada una");
+    const note = document.querySelector("[data-sticky-note]");
+    if (note) note.textContent = pack.free ? pack.title + " · envío gratis" : pack.title;
+    const go = document.querySelector("[data-go-checkout]");
+    if (go instanceof HTMLAnchorElement) go.href = "/checkout?pack=" + packId;
+    const sticky = document.querySelector("[data-sticky-go]");
+    if (sticky instanceof HTMLAnchorElement) sticky.href = "/checkout?pack=" + packId;
+    sessionStorage.setItem("alu_pack", packId);
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      packId = btn.getAttribute("data-pack") || "pack5";
+      buttons.forEach((b) => b.classList.toggle("is-on", b === btn));
+      render();
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "add_to_cart",
+        ecommerce: { currency: "PEN", value: packData().price, items: [{ item_id: packId }] },
+      });
+      if (window.fbq) window.fbq("track", "AddToCart", { value: packData().price, currency: "PEN" });
+    });
+  });
+
+  render();
+</script>

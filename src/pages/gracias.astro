@@ -1,0 +1,90 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { siteUrl } from "../data/product";
+
+const wa = import.meta.env.PUBLIC_WHATSAPP || "51999999999";
+const ads = import.meta.env.PUBLIC_GOOGLE_ADS_ID;
+const label = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
+---
+
+<BaseLayout
+  title="Pedido recibido | AluTerm"
+  description="Confirmamos tu pedido de manta térmica AluTerm."
+  canonical={`${siteUrl}/gracias`}
+  noindex
+>
+  <Header />
+  <main class="thanks" id="contenido">
+    <div class="thanks-card">
+      <p class="eyebrow">Listo</p>
+      <h1>Pedido recibido</h1>
+      <p data-msg>
+        Te escribimos por WhatsApp para coordinar el pago o la entrega. Guarda tu número de
+        pedido.
+      </p>
+      <p><b data-order></b></p>
+      <a class="btn btn-primary" data-wa href={`https://wa.me/${wa}`} rel="noopener">
+        Abrir WhatsApp
+      </a>
+      <a class="btn btn-ghost" href="/">Volver a la tienda</a>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script define:vars={{ wa, ads, label }}>
+  const params = new URLSearchParams(location.search);
+  const order = params.get("order") || "";
+  const status = params.get("status") || "ok";
+  const pay = params.get("pay") || "";
+  const orderEl = document.querySelector("[data-order]");
+  const msg = document.querySelector("[data-msg]");
+  const waLink = document.querySelector("[data-wa]");
+  if (orderEl) orderEl.textContent = order ? `Pedido ${order}` : "";
+
+  const texts = {
+    success: "Pago confirmado con Mercado Pago. Preparamos tu envío.",
+    pending: "Tu pago quedó pendiente. Te avisamos cuando Mercado Pago lo acredite.",
+    yape: "Yapea el monto exacto y escríbenos con tu número de pedido.",
+    contraentrega: "Pagas al courier cuando llega. Te confirmamos la fecha de entrega.",
+    ok: "Registramos tu pedido. Te escribimos ahora por WhatsApp.",
+  };
+  if (msg) {
+    if (status === "success") msg.textContent = texts.success;
+    else if (status === "failure") msg.textContent = "El pago no se completó. Puedes intentar de nuevo o elegir Yape / contraentrega.";
+    else if (status === "pending") msg.textContent = texts.pending;
+    else if (pay === "yape") msg.textContent = texts.yape;
+    else if (pay === "contraentrega") msg.textContent = texts.contraentrega;
+    else msg.textContent = texts.ok;
+  }
+
+  const waText = encodeURIComponent(
+    `Hola AluTerm, acabo de pedir ${order || "una manta térmica"}. Método: ${pay || status}.`,
+  );
+  if (waLink instanceof HTMLAnchorElement) {
+    waLink.href = `https://wa.me/${wa}?text=${waText}`;
+  }
+
+  const value = 65;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "purchase",
+    ecommerce: { transaction_id: order, currency: "PEN", value },
+  });
+  if (window.fbq) {
+    window.fbq("track", "Purchase", { value, currency: "PEN", content_ids: [order] });
+  }
+  if (window.gtag && ads && label) {
+    window.gtag("event", "conversion", {
+      send_to: `${ads}/${label}`,
+      value,
+      currency: "PEN",
+      transaction_id: order,
+    });
+  }
+  if (window.ttq) window.ttq.track("CompletePayment", { value, currency: "PEN" });
+</script>

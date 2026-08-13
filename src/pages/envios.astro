@@ -1,0 +1,36 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { brand, shipping, siteUrl } from "../data/product";
+---
+
+<BaseLayout
+  title={`Envíos y cambios | ${brand.name}`}
+  description="Plazos, costo de envío y cambios de AluTerm en todo el Perú."
+  canonical={`${siteUrl}/envios`}
+>
+  <Header />
+  <main class="page wrap" id="contenido">
+    <h1>Envíos y cambios</h1>
+    <h2>Costo</h2>
+    <p>
+      Lima y Callao: S/ {shipping.lima}. Provincias: S/ {shipping.provincia}. Pack de 5 o más:
+      envío gratis a todo el Perú.
+    </p>
+    <h2>Plazos</h2>
+    <p>Lima/Callao 24–48 h hábiles. Provincias 2–5 días hábiles según destino.</p>
+    <h2>Contraentrega</h2>
+    <p>
+      Disponible en la mayoría de distritos con cobertura courier. Ten el efectivo exacto. Si
+      no hay cobertura, te ofrecemos Yape o Mercado Pago.
+    </p>
+    <h2>Cambios</h2>
+    <p>
+      Avísanos por WhatsApp dentro de 7 días si el paquete llega incompleto o dañado. Te
+      reponemos o devolvemos el dinero del producto.
+    </p>
+  </main>
+  <Footer />
+</BaseLayout>

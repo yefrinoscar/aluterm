@@ -1,0 +1,31 @@
+---
+import { Image } from "astro:assets";
+import { product, specs } from "../data/product";
+import desplegada from "../assets/images/desplegada.jpg";
+---
+
+<section class="section" id="ficha">
+  <div class="wrap specs">
+    <div class="section-head" style="margin-bottom:0">
+      <p class="eyebrow">Ficha técnica</p>
+      <h2>{product.shortName} 140 × 210</h2>
+      <p>{product.description}</p>
+      <Image
+        src={desplegada}
+        alt="Manta térmica Mylar AluTerm desplegada, 140 por 210 centímetros"
+        widths={[480, 720, 960]}
+        sizes="(max-width: 70em) 100vw, 480px"
+        quality={80}
+        style="border-radius: 1.2rem; margin-top: 1rem;"
+      />
+    </div>
+    <dl class="specs-table">
+      {specs.map((row) => (
+        <div>
+          <dt>{row.label}</dt>
+          <dd>{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

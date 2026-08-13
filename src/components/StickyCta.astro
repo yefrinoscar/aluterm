@@ -1,0 +1,15 @@
+---
+import { packs } from "../data/product";
+import { soles } from "../lib/money";
+const best = packs.find((p) => p.highlight)!;
+---
+
+<div class="sticky">
+  <div class="wrap sticky-inner">
+    <div>
+      <div class="now" data-sticky-now data-total>{soles(best.price)}</div>
+      <small data-sticky-note>Pack x5 · envío gratis</small>
+    </div>
+    <a class="btn btn-primary" href={`/checkout?pack=${best.id}`} data-sticky-go>Pagar</a>
+  </div>
+</div>

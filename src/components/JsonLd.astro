@@ -1,0 +1,169 @@
+---
+import { brand, faqs, packs, product, siteUrl } from "../data/product";
+
+const offers = packs.map((pack) => ({
+  "@type": "Offer",
+  name: pack.title,
+  sku: `${product.sku}-${pack.id}`,
+  url: `${siteUrl}/#packs`,
+  priceCurrency: "PEN",
+  price: pack.price.toFixed(2),
+  priceValidUntil: "2027-12-31",
+  availability: "https://schema.org/InStock",
+  itemCondition: "https://schema.org/NewCondition",
+  shippingDetails: {
+    "@type": "OfferShippingDetails",
+    shippingRate: {
+      "@type": "MonetaryAmount",
+      value: pack.freeShipping ? "0" : "10.00",
+      currency: "PEN",
+    },
+    shippingDestination: {
+      "@type": "DefinedRegion",
+      addressCountry: "PE",
+    },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      handlingTime: {
+        "@type": "QuantitativeValue",
+        minValue: 0,
+        maxValue: 1,
+        unitCode: "DAY",
+      },
+      transitTime: {
+        "@type": "QuantitativeValue",
+        minValue: 1,
+        maxValue: 5,
+        unitCode: "DAY",
+      },
+    },
+  },
+  hasMerchantReturnPolicy: {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "PE",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 7,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/FreeReturn",
+  },
+}));
+
+const graph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#org`,
+      name: brand.legalName,
+      url: siteUrl,
+      logo: `${siteUrl}/favicon.svg`,
+      email: brand.email,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Lima",
+        addressCountry: "PE",
+      },
+      areaServed: "PE",
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      url: siteUrl,
+      name: brand.legalName,
+      inLanguage: "es-PE",
+      publisher: { "@id": `${siteUrl}/#org` },
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/#webpage`,
+      url: siteUrl,
+      name: product.name,
+      isPartOf: { "@id": `${siteUrl}/#website` },
+      about: { "@id": `${siteUrl}/#product` },
+      inLanguage: "es-PE",
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Inicio", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: "Manta térmica de emergencia", item: `${siteUrl}/#producto` },
+      ],
+    },
+    {
+      "@type": "Product",
+      "@id": `${siteUrl}/#product`,
+      name: product.name,
+      description: product.description,
+      image: [
+        `${siteUrl}/og.jpg`,
+      ],
+      sku: product.sku,
+      brand: { "@type": "Brand", name: brand.name },
+      material: product.material,
+      color: product.color,
+      category: "Equipamiento de emergencia y camping",
+      countryOfOrigin: "CN",
+      size: `${product.heightCm}x${product.widthCm} cm`,
+      weight: {
+        "@type": "QuantitativeValue",
+        value: product.weightG,
+        unitCode: "GRM",
+      },
+      additionalProperty: [
+        {
+          "@type": "PropertyValue",
+          name: "Retención de calor",
+          value: `${product.heatRetention}%`,
+        },
+      ],
+      offers: {
+        "@type": "AggregateOffer",
+        url: `${siteUrl}/#packs`,
+        priceCurrency: "PEN",
+        lowPrice: Math.min(...packs.map((p) => p.unitPrice)).toFixed(2),
+        highPrice: Math.max(...packs.map((p) => p.price)).toFixed(2),
+        offerCount: packs.length,
+        availability: "https://schema.org/InStock",
+        seller: { "@id": `${siteUrl}/#org` },
+        offers,
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
+    },
+    {
+      "@type": "HowTo",
+      name: "Cómo usar una manta térmica de emergencia",
+      description: "Tres pasos para conservar el calor corporal con una manta de Mylar.",
+      totalTime: "PT2M",
+      step: [
+        {
+          "@type": "HowToStep",
+          position: 1,
+          name: "Ábrela y envuélvete",
+          text: "Despliégala y cúbrete dejando la cara plateada hacia adentro.",
+        },
+        {
+          "@type": "HowToStep",
+          position: 2,
+          name: "Sella el viento",
+          text: "Tápate la cabeza si puedes y evita que entre aire por los pies.",
+        },
+        {
+          "@type": "HowToStep",
+          position: 3,
+          name: "Señala o protégete",
+          text: "Usa la cara plateada afuera como señal de rescate o como toldo.",
+        },
+      ],
+    },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(graph)} />

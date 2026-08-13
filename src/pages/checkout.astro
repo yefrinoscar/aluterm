@@ -1,0 +1,258 @@
+---
+export const prerender = true;
+
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { departments, packs, shipping, siteUrl } from "../data/product";
+import { soles } from "../lib/money";
+import packsImg from "../assets/images/packs.jpg";
+
+const yapePhone = import.meta.env.PUBLIC_YAPE_PHONE || "999999999";
+const yapeName = import.meta.env.PUBLIC_YAPE_NAME || "AluTerm";
+const best = packs.find((p) => p.highlight)!;
+---
+
+<BaseLayout
+  title="Pagar tu manta térmica | AluTerm"
+  description="Elige envío y paga con Yape, Mercado Pago o contraentrega."
+  canonical={`${siteUrl}/checkout`}
+  noindex
+>
+  <Header />
+  <main class="paypage" id="contenido">
+    <div class="wrap pay-wrap">
+      <a class="back" href="/#comprar">← Volver al producto</a>
+      <h1>Pago y envío</h1>
+      <p class="pay-lead">Confirma el pack, tu dirección y cómo quieres pagar.</p>
+
+      <div class="pay-grid">
+        <form class="panel-light form" id="order-form" novalidate>
+          <div class="form-error" data-error></div>
+
+          <p class="buy-label">Pack</p>
+          <div class="offers offers-mini">
+            {packs.map((pack) => (
+              <button
+                type="button"
+                class:list={["offer", pack.highlight && "is-on"]}
+                data-pack={pack.id}
+                data-units={pack.units}
+                data-price={pack.price}
+                data-compareat={pack.compareAt}
+                data-unitprice={pack.unitPrice}
+                data-free={pack.freeShipping ? "1" : "0"}
+                data-title={pack.title}
+              >
+                <span class="offer-radio"></span>
+                <span class="offer-body">
+                  <span class="offer-top"><strong>{pack.title}</strong></span>
+                  <span class="offer-sub">{pack.subtitle}</span>
+                </span>
+                <span class="offer-price">
+                  <b>{soles(pack.price)}</b>
+                  <small>{pack.freeShipping ? "Envío gratis" : soles(pack.unitPrice) + " c/u"}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <p class="buy-label">Entrega</p>
+          <div class="form-row">
+            <label>Nombre
+              <input name="name" autocomplete="name" required minlength="3" placeholder="Nombre y apellido" />
+            </label>
+            <label>Celular
+              <input name="phone" inputmode="numeric" autocomplete="tel" required placeholder="9XXXXXXXX" />
+            </label>
+          </div>
+          <label>Correo
+            <input name="email" type="email" autocomplete="email" required placeholder="para confirmar el pedido" />
+          </label>
+          <div class="form-row">
+            <label>Departamento
+              <select name="department" required>
+                {departments.map((d) => (
+                  <option value={d} selected={d === "Lima"}>{d}</option>
+                ))}
+              </select>
+            </label>
+            <label>Distrito
+              <input name="district" required placeholder="Distrito" />
+            </label>
+          </div>
+          <label>Dirección
+            <input name="address" autocomplete="street-address" required placeholder="Calle, número, dpto." />
+          </label>
+          <label>Referencia <span class="opt">(opcional)</span>
+            <input name="reference" placeholder="Frente al parque, piso 3…" />
+          </label>
+          <input type="hidden" name="dni" value="" />
+
+          <p class="buy-label">Pago</p>
+          <div class="pay-picks">
+            <button type="button" class="pay-pick is-on" data-pay="mercadopago">Mercado Pago</button>
+            <button type="button" class="pay-pick" data-pay="yape">Yape</button>
+            <button type="button" class="pay-pick" data-pay="contraentrega">Contraentrega</button>
+          </div>
+
+          <div class="yape-box" data-yape>
+            <img src="/images/yape-qr.svg" alt="QR de Yape AluTerm" width="120" height="120" />
+            <div>
+              <b>Yapea a {yapeName}</b>
+              <p>Número <b data-yape-phone>{yapePhone}</b></p>
+              <p>Monto <b data-yape-amount>{soles(best.price)}</b></p>
+            </div>
+          </div>
+
+          <input type="hidden" name="packId" value="pack5" />
+          <input type="hidden" name="paymentMethod" value="mercadopago" />
+
+          <button class="btn btn-primary btn-full btn-buy" type="submit" data-submit>
+            Pagar · <span data-total>{soles(best.price)}</span>
+          </button>
+        </form>
+
+        <aside class="summary-card">
+          <Image src={packsImg} alt="Mantas térmicas AluTerm" width={640} quality={78} />
+          <div class="summary-card-body">
+            <p class="buy-label">Tu pedido</p>
+            <p><b data-pack-name>{best.title}</b></p>
+            <div class="summary-line"><span>Producto</span><b data-sub>{soles(best.price)}</b></div>
+            <div class="summary-line"><span>Envío</span><b data-ship>Gratis</b></div>
+            <div class="summary-total"><span>Total</span><b data-total>{soles(best.price)}</b></div>
+            <p class="buy-fine" style="text-align:left;margin-top:.6rem">
+              Lima/Callao S/ {shipping.lima} · provincias S/ {shipping.provincia}. Gratis desde 5 unidades.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script define:vars={{ lima: shipping.lima, provincia: shipping.provincia }}>
+  const form = document.getElementById("order-form");
+  if (form instanceof HTMLFormElement) {
+    const params = new URLSearchParams(location.search);
+    const stored = sessionStorage.getItem("alu_pack");
+    const start = params.get("pack") || stored || "pack5";
+    const packButtons = [...document.querySelectorAll("[data-pack]")];
+    const payButtons = [...document.querySelectorAll("[data-pay]")];
+    const yapeBox = document.querySelector("[data-yape]");
+    const errorBox = document.querySelector("[data-error]");
+    const packInput = form.elements.namedItem("packId");
+    const payInput = form.elements.namedItem("paymentMethod");
+    const dept = form.elements.namedItem("department");
+    const state = { packId: start, pay: "mercadopago" };
+
+    function packData() {
+      const btn = document.querySelector(`[data-pack="${state.packId}"]`) || document.querySelector("[data-pack]");
+      return {
+        units: Number(btn?.getAttribute("data-units") || 5),
+        price: Number(btn?.getAttribute("data-price") || 50),
+        free: btn?.getAttribute("data-free") === "1",
+        title: btn?.getAttribute("data-title") || "Pack x5",
+      };
+    }
+
+    function shipCost() {
+      const pack = packData();
+      if (pack.free) return 0;
+      const value = dept instanceof HTMLSelectElement ? dept.value : "Lima";
+      return value === "Lima" || value === "Callao" ? lima : provincia;
+    }
+
+    function money(n) {
+      return new Intl.NumberFormat("es-PE", {
+        style: "currency",
+        currency: "PEN",
+        maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function render() {
+      const pack = packData();
+      const ship = shipCost();
+      const total = pack.price + ship;
+      const set = (sel, text) => {
+        document.querySelectorAll(sel).forEach((el) => {
+          el.textContent = text;
+        });
+      };
+      set("[data-sub]", money(pack.price));
+      set("[data-ship]", ship === 0 ? "Gratis" : money(ship));
+      set("[data-total]", money(total));
+      set("[data-yape-amount]", money(total));
+      set("[data-pack-name]", pack.title);
+      if (packInput instanceof HTMLInputElement) packInput.value = state.packId;
+      if (payInput instanceof HTMLInputElement) payInput.value = state.pay;
+      yapeBox?.classList.toggle("is-on", state.pay === "yape");
+      packButtons.forEach((b) => b.classList.toggle("is-on", b.getAttribute("data-pack") === state.packId));
+    }
+
+    packButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.packId = btn.getAttribute("data-pack") || "pack5";
+        sessionStorage.setItem("alu_pack", state.packId);
+        render();
+      });
+    });
+
+    payButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.pay = btn.getAttribute("data-pay") || "mercadopago";
+        payButtons.forEach((b) => b.classList.toggle("is-on", b === btn));
+        render();
+      });
+    });
+
+    dept?.addEventListener("change", render);
+    render();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector("[data-submit]");
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.attribution = JSON.parse(localStorage.getItem("alu_attr") || "{}");
+      errorBox?.classList.remove("is-on");
+      if (submit instanceof HTMLButtonElement) {
+        submit.disabled = true;
+        submit.textContent = "Procesando…";
+      }
+      if (window.fbq) window.fbq("track", "InitiateCheckout", { value: packData().price, currency: "PEN" });
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "begin_checkout", ecommerce: { currency: "PEN", value: packData().price } });
+      try {
+        const res = await fetch("/api/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "No se pudo crear el pedido");
+        if (data.initPoint) {
+          location.href = data.initPoint;
+          return;
+        }
+        const next = new URL("/gracias", location.origin);
+        next.searchParams.set("order", data.orderId);
+        next.searchParams.set("status", data.status || "ok");
+        next.searchParams.set("pay", state.pay);
+        location.href = next.toString();
+      } catch (err) {
+        if (errorBox) {
+          errorBox.textContent = err instanceof Error ? err.message : "Inténtalo de nuevo";
+          errorBox.classList.add("is-on");
+        }
+        if (submit instanceof HTMLButtonElement) {
+          submit.disabled = false;
+          submit.innerHTML = 'Pagar · <span data-total></span>';
+          render();
+        }
+      }
+    });
+  }
+</script>

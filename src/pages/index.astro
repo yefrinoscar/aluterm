@@ -1,0 +1,38 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Buy from "../components/Buy.astro";
+import TrustBar from "../components/TrustBar.astro";
+import Uses from "../components/Uses.astro";
+import Benefits from "../components/Benefits.astro";
+import Band from "../components/Band.astro";
+import Specs from "../components/Specs.astro";
+import HowTo from "../components/HowTo.astro";
+import FAQ from "../components/FAQ.astro";
+import Footer from "../components/Footer.astro";
+import StickyCta from "../components/StickyCta.astro";
+import { seo, siteUrl } from "../data/product";
+---
+
+<BaseLayout
+  title={seo.title}
+  description={seo.description}
+  canonical={siteUrl}
+  type="product"
+>
+  <Header />
+  <main id="contenido">
+    <Buy />
+    <TrustBar />
+    <Uses />
+    <Benefits />
+    <Band />
+    <Specs />
+    <HowTo />
+    <FAQ />
+  </main>
+  <Footer />
+  <StickyCta />
+</BaseLayout>

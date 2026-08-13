@@ -1,0 +1,40 @@
+---
+import { Image } from "astro:assets";
+import { uses } from "../data/product";
+import sismo from "../assets/images/uso-sismo.jpg";
+import auto from "../assets/images/uso-auto.jpg";
+import trekking from "../assets/images/uso-trekking.jpg";
+import compact from "../assets/images/compact.jpg";
+
+const images = { sismo, auto, trekking, camping: compact };
+---
+
+<section class="section" id="usos">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Dónde va</p>
+      <h2>Sismo, auto, cerro, mochila. Un ítem, cuatro huecos.</h2>
+      <p>
+        No es un gadget. Es el seguro más barato que puedes tener listo antes de que haga
+        falta.
+      </p>
+    </div>
+    <div class="uses-grid">
+      {uses.map((use) => (
+        <article class="card">
+          <Image
+            src={images[use.id as keyof typeof images]}
+            alt={`${use.title}: manta térmica de emergencia AluTerm`}
+            widths={[400, 640, 900]}
+            sizes="(max-width: 52em) 100vw, 520px"
+            quality={80}
+          />
+          <div class="card-body">
+            <h3>{use.title}</h3>
+            <p>{use.text}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

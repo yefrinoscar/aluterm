@@ -1,0 +1,24 @@
+---
+import { brand } from "../data/product";
+const wa = import.meta.env.PUBLIC_WHATSAPP || "51999999999";
+---
+
+<div class="announce">
+  <div class="wrap announce-inner">
+    <span><b>Envío gratis</b> en pack de 5 · Yape · Contraentrega · Mercado Pago</span>
+  </div>
+</div>
+
+<header class="header">
+  <div class="wrap header-inner">
+    <a class="logo" href="/" aria-label={`${brand.name} inicio`}>
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="#13181e"></rect>
+        <path d="M7 21c4-8 14-8 18 0" fill="none" stroke="#f3eee4" stroke-width="2"></path>
+        <path d="M8 18h16" stroke="#b7c0c8" stroke-width="2"></path>
+      </svg>
+      {brand.name}
+    </a>
+    <a class="btn btn-ghost" href={`https://wa.me/${wa}`} rel="noopener">WhatsApp</a>
+  </div>
+</header>

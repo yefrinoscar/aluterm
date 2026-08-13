@@ -1,0 +1,89 @@
+---
+import { Image } from "astro:assets";
+import { packs, product } from "../data/product";
+import { soles } from "../lib/money";
+import persona from "../assets/images/persona-frente.jpg";
+import perfil from "../assets/images/persona-perfil.jpg";
+import packsImg from "../assets/images/packs.jpg";
+import compact from "../assets/images/compact.jpg";
+import desplegada from "../assets/images/desplegada.jpg";
+
+const best = packs.find((p) => p.highlight)!;
+const thumbs = [
+  { src: persona, alt: "Hombre envuelto en manta térmica de emergencia Mylar plateada" },
+  { src: packsImg, alt: "Packs de mantas térmicas AluTerm plegadas" },
+  { src: compact, alt: "Manta térmica plegada en la palma de la mano" },
+  { src: desplegada, alt: "Manta térmica Mylar 140 por 210 cm desplegada" },
+  { src: perfil, alt: "Uso de manta aluminizada de emergencia" },
+];
+---
+
+<section class="hero" id="producto">
+  <div class="wrap-wide hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Manta térmica de emergencia · 140 × 210 cm</p>
+      <h1>{product.headline}</h1>
+      <p class="hero-lead">{product.subhead}</p>
+      <div class="hero-price">
+        <span class="now">Desde {soles(best.unitPrice)}</span>
+        <span class="was">{soles(packs[0].price)}</span>
+        <span class="note">Pack x5 · envío gratis</span>
+      </div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#packs" data-cta="hero-packs">Ver packs</a>
+        <a class="btn btn-ghost" href="#comprar" data-cta="hero-buy">Comprar ahora</a>
+      </div>
+      <div class="hero-trust">
+        <span>Yape y Mercado Pago</span>
+        <span>Contraentrega</span>
+        <span>Envío a todo el Perú</span>
+      </div>
+    </div>
+
+    <div class="gallery" data-gallery>
+      <div class="gallery-main">
+        <Image
+          src={persona}
+          alt={thumbs[0].alt}
+          widths={[480, 720, 960, 1200]}
+          sizes="(max-width: 52em) 100vw, 560px"
+          quality={82}
+          id="gallery-main"
+        />
+      </div>
+      <div class="gallery-thumbs" role="list">
+        {thumbs.map((thumb, i) => (
+          <button
+            type="button"
+            data-thumb={i}
+            data-full={thumb.src.src}
+            data-alt={thumb.alt}
+            class={i === 0 ? "is-active" : ""}
+            aria-label={`Ver foto ${i + 1}`}
+          >
+            <Image src={thumb.src} alt={thumb.alt} width={160} quality={70} />
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector("[data-gallery]");
+  const main = document.querySelector<HTMLImageElement>("#gallery-main");
+  if (root && main) {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-thumb]")];
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const full = btn.getAttribute("data-full");
+        const alt = btn.getAttribute("data-alt") || "";
+        if (!full) return;
+        main.src = full;
+        main.removeAttribute("srcset");
+        main.alt = alt;
+        buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
+      });
+    });
+  }
+</script>

@@ -1,0 +1,48 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { brand, siteUrl } from "../data/product";
+---
+
+<BaseLayout
+  title={`Términos y condiciones | ${brand.name}`}
+  description="Condiciones de compra de mantas térmicas AluTerm en Perú."
+  canonical={`${siteUrl}/terminos`}
+>
+  <Header />
+  <main class="page wrap" id="contenido">
+    <h1>Términos y condiciones</h1>
+    <p>
+      Al comprar en este sitio aceptas estas condiciones. El vendedor es {brand.legalName},
+      Lima, Perú.
+    </p>
+    <h2>Producto</h2>
+    <p>
+      Manta térmica aluminizada de Mylar de 140 × 210 cm. Es un artículo de emergencia: refleja
+      calor corporal, no genera calor propio y no reemplaza un saco de dormir de alta montaña.
+    </p>
+    <h2>Precios y packs</h2>
+    <p>
+      Precios en soles e incluyen IGV si corresponde. El pack de 3 y el de 5 tienen un precio
+      unitario menor. El envío gratis aplica desde 5 unidades.
+    </p>
+    <h2>Pago</h2>
+    <p>
+      Mercado Pago, Yape directo o contraentrega. El pedido se confirma cuando el pago se
+      acredita o cuando aceptamos el contraentrega.
+    </p>
+    <h2>Entrega</h2>
+    <p>
+      Lima y Callao: 24 a 48 horas hábiles. Provincias: 2 a 5 días hábiles. Los plazos son
+      estimados y pueden variar por el courier o la zona.
+    </p>
+    <h2>Cambios</h2>
+    <p>
+      7 días si llega dañado o no es lo pedido. No hay devolución por cambio de opinión una vez
+      abierto el sobre, por higiene y por ser un artículo de emergencia.
+    </p>
+  </main>
+  <Footer />
+</BaseLayout>

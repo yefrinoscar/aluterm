@@ -1,0 +1,24 @@
+---
+import { benefits } from "../data/product";
+---
+
+<section class="section" id="beneficios">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Por qué funciona</p>
+      <h2>No genera calor. No deja que se escape el tuyo.</h2>
+      <p>
+        El Mylar aluminizado devuelve la radiación térmica al cuerpo. Por eso la usan
+        rescatistas, maratonistas y kits de supervivencia en todo el mundo.
+      </p>
+    </div>
+    <div class="benefits-grid">
+      {benefits.map((item) => (
+        <article class="card benefit">
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+---
+import { brand } from "../data/product";
+const wa = import.meta.env.PUBLIC_WHATSAPP || "51999999999";
+---
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <strong style="color:#fff">{brand.name}</strong>
+      <p>Manta térmica Mylar 140 × 210. Envío a todo el Perú.</p>
+    </div>
+    <div>
+      <h3>Pedido</h3>
+      <ul>
+        <li><a href="/#comprar">Elegir pack</a></li>
+        <li><a href="/checkout">Pagar</a></li>
+        <li><a href={`https://wa.me/${wa}`} rel="noopener">WhatsApp</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="/envios">Envíos</a></li>
+        <li><a href="/terminos">Términos</a></li>
+        <li><a href="/politicas">Privacidad</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap legal">© {new Date().getFullYear()} {brand.legalName}</div>
+</footer>
