@@ -1,0 +1,225 @@
+---
+interface Props {
+  variant?: "classic" | "trekking";
+}
+
+const { variant = "classic" } = Astro.props;
+const yapeIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAMAAABiM0N1AAAAjVBMVEUAAAD///////////////////////////////////////+LPZkQy7T48/nx5/LFnsyZVqahYq2SSZ/iz+XNqtPh+fa3hr++ksaobrPTttku0b3q2+ul6+Pbw98fzrlM2Mewermvernw/Pvp2+x44tVp39DD8uyW6N+H5drS9fG07+il7OPTt9la3Mw91cJnqFFrAAAACnRSTlMA79+fIM+/UEAww3ZB3gAAAoJJREFUWMPt2Etv4jAUBeAMFErvsR3bcd4J4Vno8///vLlOqVjMZmJnpFn0LAAh8encGzkSScZslgsKzGr5mHznYU1RWTx8OU+/KDK/nsY+7ERLvtOCZsg6SR5plmyS5TzQMlnNAy0Smik/0DzQ80cjxNDlkVA+iK80XRSUc5vvXGIgdu55Doe6cait4Gy3YgiHBt/jJb/y2/UixCEYYmB4EdvDVjR+W10olPuR8q4Z2LiKCOjgoeacX7iQ4LwGj8ZrPr8JkX92Zw+9BEMnP9rplJ/HQg0FQ7n/+fXUNJ8e6sIhuoh7TlFn7e6cKQY68JJGZnilKOhZfBzy17e3nDhRjbp/dodsexUDyZayouYPKWDbMKhVWSkd9gAUO3oPNxlyWskKsMh2wF6jVtDKIZsAyV4S1QAVsNxFGhRUIi1QKq2n7ChDSbRDlYFLwcivsVLAwE5adu0hC7dD5tEMhl0PoTrSFKhCxhi4EPF0vRtdhozithMg5YEddO8BjXaHnt2KhyNKrfx7qEbBGAr/ywwgAyU1agftKpgJjXZwPBH6FJU0QAloC+1N8DcTIIN9CUA63FJoaF6PM1U96axpABoVSQBpZQ2vXgUd2hRIjd9sW/oGBRSftt6VRVWVkyDKjgrIbuf1XcNY3KInQRwHK1tX3AVYU5TuXU6EpMFdgHbvRxmyI5neipjCHWWLOvAO2Y/M3mXy5lIYlALWoqJ7wiB2SmVRx0IKSP3Jl7FQhYJI80skpADlp1OxUI89Hf10sVANk1oYioYUOFrFQ9Qbnf5xxf6rf0c/0FzQYh5nNd8jjc08ED/WWs/hLGZ7EDXnozHuFHnl1tznlsflKng7y81I/AaRjtxLM7lhlAAAAABJRU5ErkJggg==";
+---
+
+<div class:list={["payment-trust", `payment-trust--${variant}`]} aria-label="Métodos de pago seguros">
+  <div class="payment-trust__secure">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+      <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"></path>
+    </svg>
+    <span>Compra segura</span>
+  </div>
+
+  <div class="payment-trust__methods">
+    <span class="payment-brand payment-brand--yape" aria-label="Yape">
+      <img src={yapeIcon} alt="" width="28" height="28" />
+      <b>Yape</b>
+    </span>
+    <span class="payment-brand payment-brand--mp" aria-label="Mercado Pago">
+      <svg viewBox="0 0 40 26" aria-hidden="true">
+        <ellipse cx="20" cy="13" rx="19" ry="11" fill="#00a9e0"></ellipse>
+        <path d="M8.5 13.3c2.4-2 4.2-2.8 6-2.2l2.1.8 2.1-1.7c1.5-1.2 3-1.1 4.5.1l7.8 5.6M11.3 16.2l2.8 2.2c.8.6 1.8.5 2.4-.3l.3-.4m0 0 1.1.8c.8.6 1.8.4 2.3-.3l.4-.6m0 0 .9.6c.8.5 1.8.2 2.2-.6l.2-.5M31.3 10.7c-2.2 1.1-4.3 1.4-6.6.6" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.45"></path>
+      </svg>
+      <b>Mercado Pago</b>
+    </span>
+  </div>
+
+  <div class="payment-trust__cards" aria-label="Aceptamos Visa, Mastercard y American Express">
+    <span class="card-mark card-mark--visa" aria-label="Visa">VISA</span>
+    <span class="card-mark card-mark--mastercard" aria-label="Mastercard">
+      <i></i><i></i><small>mastercard</small>
+    </span>
+    <span class="card-mark card-mark--amex" aria-label="American Express">AMERICAN<br />EXPRESS</span>
+  </div>
+</div>
+
+<style>
+  .payment-trust {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 13px;
+    margin-top: 16px;
+    padding-top: 15px;
+    border-top: 1px solid var(--payment-line, #d8dde0);
+  }
+
+  .payment-trust__secure,
+  .payment-trust__methods,
+  .payment-trust__cards,
+  .payment-brand,
+  .card-mark--mastercard {
+    display: flex;
+    align-items: center;
+  }
+
+  .payment-trust__secure {
+    gap: 6px;
+    color: var(--payment-muted, #566068);
+    font-size: 0.66rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .payment-trust__secure svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: var(--payment-lock, #1f7a48);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .payment-trust__methods {
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .payment-brand {
+    min-height: 34px;
+    gap: 6px;
+    padding: 4px 8px 4px 5px;
+    border: 1px solid var(--payment-line, #d8dde0);
+    border-radius: var(--payment-radius, 7px);
+    background: #fff;
+    color: #25292d;
+    line-height: 1;
+  }
+
+  .payment-brand img {
+    width: 25px;
+    height: 25px;
+    border-radius: 6px;
+  }
+
+  .payment-brand svg {
+    width: 31px;
+    height: 21px;
+  }
+
+  .payment-brand b {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.61rem;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+  }
+
+  .payment-brand--yape b {
+    color: #5f259f;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .payment-brand--mp b {
+    color: #253746;
+  }
+
+  .payment-trust__cards {
+    justify-content: end;
+    gap: 5px;
+  }
+
+  .card-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 25px;
+    overflow: hidden;
+    border: 1px solid #d5d9dc;
+    border-radius: 4px;
+    background: #fff;
+    line-height: 1;
+  }
+
+  .card-mark--visa {
+    color: #17357e;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.75rem;
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: -0.06em;
+  }
+
+  .card-mark--mastercard {
+    position: relative;
+    justify-content: center;
+    padding-bottom: 6px;
+  }
+
+  .card-mark--mastercard i {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #eb001b;
+  }
+
+  .card-mark--mastercard i + i {
+    margin-left: -5px;
+    background: #f79e1b;
+    mix-blend-mode: multiply;
+  }
+
+  .card-mark--mastercard small {
+    position: absolute;
+    bottom: 2px;
+    color: #222;
+    font: 500 0.3rem/1 Arial, sans-serif;
+    letter-spacing: -0.04em;
+  }
+
+  .card-mark--amex {
+    background: #1573b9;
+    color: #fff;
+    font: 800 0.35rem/0.9 Arial, sans-serif;
+    letter-spacing: -0.03em;
+    text-align: center;
+  }
+
+  .payment-trust--trekking {
+    --payment-line: #c7cdd1;
+    --payment-muted: #4c545a;
+    --payment-lock: #26734d;
+    --payment-radius: 2px;
+  }
+
+  .payment-trust--classic {
+    --payment-line: #dce1e3;
+    --payment-muted: #44515a;
+    --payment-lock: #18794e;
+    --payment-radius: 8px;
+  }
+
+  @media (max-width: 620px) {
+    .payment-trust {
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    .payment-trust__secure {
+      grid-column: 1 / -1;
+      justify-content: center;
+    }
+
+    .payment-trust__methods {
+      justify-content: start;
+    }
+  }
+
+  @media (max-width: 390px) {
+    .payment-trust {
+      grid-template-columns: 1fr;
+    }
+
+    .payment-trust__methods,
+    .payment-trust__cards {
+      justify-content: center;
+    }
+  }
+</style>

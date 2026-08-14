@@ -6,7 +6,9 @@ import {
   isValidPhone,
   makeOrderId,
   notifyOrder,
+  type OrderStore,
   type PaymentMethod,
+  type RuntimeEnv,
 } from "../../lib/orders";
 import { createPreference, mercadoPagoReady } from "../../lib/mercadopago";
 
@@ -14,7 +16,9 @@ export const prerender = false;
 
 const methods: PaymentMethod[] = ["mercadopago", "yape", "contraentrega"];
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  const env = (locals as { runtime?: { env?: RuntimeEnv } }).runtime?.env;
+  const store = env?.ORDERS as OrderStore | undefined;
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -49,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (address.length < 5) return json({ error: "Escribe tu dirección" }, 400);
   if (dni && !/^\d{8}$/.test(dni)) return json({ error: "DNI debe tener 8 dígitos" }, 400);
 
-  if (paymentMethod === "mercadopago" && !mercadoPagoReady()) {
+  if (paymentMethod === "mercadopago" && !mercadoPagoReady(env)) {
     return json(
       {
         error:
@@ -72,13 +76,13 @@ export const POST: APIRoute = async ({ request }) => {
     status: paymentMethod === "contraentrega" ? "cod" : "pending",
     buyer: { name, phone, email, dni: dni || undefined, department, district, address, reference },
     notes: JSON.stringify(body.attribution || {}),
-  });
+  }, store);
 
-  await notifyOrder(order);
+  await notifyOrder(order, env);
 
   if (paymentMethod === "mercadopago") {
     try {
-      const pref = await createPreference(order);
+      const pref = await createPreference(order, env);
       return json({
         orderId: order.id,
         status: order.status,

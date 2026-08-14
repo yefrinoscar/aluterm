@@ -1,10 +1,12 @@
 import type { APIRoute } from "astro";
 import { getPayment } from "../../lib/mercadopago";
-import { updateOrder } from "../../lib/orders";
+import { updateOrder, type OrderStore, type RuntimeEnv } from "../../lib/orders";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  const env = (locals as { runtime?: { env?: RuntimeEnv } }).runtime?.env;
+  const store = env?.ORDERS as OrderStore | undefined;
   let payload: Record<string, unknown> = {};
   try {
     payload = await request.json();
@@ -18,14 +20,14 @@ export const POST: APIRoute = async ({ request }) => {
 
   if ((type === "payment" || type.includes("payment")) && paymentId) {
     try {
-      const payment = await getPayment(String(paymentId));
+      const payment = await getPayment(String(paymentId), env);
       const ref = String(payment?.external_reference || "");
       const status = String(payment?.status || "");
       if (ref) {
         await updateOrder(ref, {
           status: status === "approved" ? "paid" : status === "rejected" ? "cancelled" : "pending",
           mpPaymentId: String(paymentId),
-        });
+        }, store);
       }
     } catch (error) {
       console.error("webhook payment", error);

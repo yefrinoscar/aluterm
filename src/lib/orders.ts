@@ -1,5 +1,3 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import type { PackId } from "../data/product";
 
 export type PaymentMethod = "mercadopago" | "yape" | "contraentrega";
@@ -29,11 +27,24 @@ export type Order = {
   notes?: string;
 };
 
-const filePath = path.join(process.cwd(), ".data", "orders.json");
+export type OrderStore = {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string): Promise<void>;
+};
+
+export type RuntimeEnv = Record<string, unknown>;
+
+const orderKey = (id: string) => `order:${id}`;
+
+async function filePath(): Promise<string> {
+  const path = await import("node:path");
+  return path.join(process.cwd(), ".data", "orders.json");
+}
 
 async function load(): Promise<Order[]> {
   try {
-    const raw = await readFile(filePath, "utf8");
+    const { readFile } = await import("node:fs/promises");
+    const raw = await readFile(await filePath(), "utf8");
     return JSON.parse(raw) as Order[];
   } catch {
     return [];
@@ -41,8 +52,11 @@ async function load(): Promise<Order[]> {
 }
 
 async function save(orders: Order[]): Promise<void> {
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(orders, null, 2), "utf8");
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const path = await import("node:path");
+  const target = await filePath();
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, JSON.stringify(orders, null, 2), "utf8");
 }
 
 export function makeOrderId(): string {
@@ -51,7 +65,11 @@ export function makeOrderId(): string {
   return `AT-${day}-${rand}`;
 }
 
-export async function createOrder(order: Order): Promise<Order> {
+export async function createOrder(order: Order, store?: OrderStore): Promise<Order> {
+  if (store) {
+    await store.put(orderKey(order.id), JSON.stringify(order));
+    return order;
+  }
   const orders = await load();
   orders.push(order);
   await save(orders);
@@ -61,7 +79,15 @@ export async function createOrder(order: Order): Promise<Order> {
 export async function updateOrder(
   id: string,
   patch: Partial<Order>,
+  store?: OrderStore,
 ): Promise<Order | undefined> {
+  if (store) {
+    const current = await findOrder(id, store);
+    if (!current) return undefined;
+    const updated = { ...current, ...patch };
+    await store.put(orderKey(id), JSON.stringify(updated));
+    return updated;
+  }
   const orders = await load();
   const index = orders.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
@@ -70,7 +96,11 @@ export async function updateOrder(
   return orders[index];
 }
 
-export async function findOrder(id: string): Promise<Order | undefined> {
+export async function findOrder(id: string, store?: OrderStore): Promise<Order | undefined> {
+  if (store) {
+    const raw = await store.get(orderKey(id));
+    return raw ? (JSON.parse(raw) as Order) : undefined;
+  }
   const orders = await load();
   return orders.find((item) => item.id === id);
 }
@@ -83,8 +113,12 @@ export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export async function notifyOrder(order: Order): Promise<void> {
-  const hook = process.env.ORDER_NOTIFY_WEBHOOK;
+export async function notifyOrder(order: Order, env?: RuntimeEnv): Promise<void> {
+  const hook = typeof env?.ORDER_NOTIFY_WEBHOOK === "string"
+    ? env.ORDER_NOTIFY_WEBHOOK
+    : typeof process !== "undefined"
+      ? process.env.ORDER_NOTIFY_WEBHOOK
+      : undefined;
   if (!hook) return;
   try {
     await fetch(hook, {

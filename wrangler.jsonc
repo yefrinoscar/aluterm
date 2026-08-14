@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "aluterm",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-08-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "kv_namespaces": [
+    {
+      "binding": "ORDERS",
+      "id": "345e91e08adb420996ca6066e1b59a19"
+    },
+    {
+      "binding": "SESSION",
+      "id": "fa53ef755d814e9f9908e3e9a1bebbcc"
+    }
+  ]
+}

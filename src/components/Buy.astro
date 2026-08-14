@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import PaymentTrust from "./PaymentTrust.astro";
 import { packs, product, shipping } from "../data/product";
 import { soles } from "../lib/money";
 import persona from "../assets/images/persona-frente.jpg";
@@ -100,6 +101,7 @@ const thumbs = [
       <a class="btn btn-primary btn-full btn-buy" href={`/checkout?pack=${best.id}`} data-go-checkout>
         Continuar al pago · <span data-total>{soles(best.price)}</span>
       </a>
+      <PaymentTrust variant="classic" />
       <p class="buy-fine">
         En la siguiente pantalla eliges Yape, Mercado Pago o contraentrega.
         Envío Lima S/ {shipping.lima} · provincias S/ {shipping.provincia} · gratis desde 5.
